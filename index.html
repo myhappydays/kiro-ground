@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☘️Kiro Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'MonoplexKR-Regular';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_Monoplex-kr@1.0/MonoplexKR-Regular.woff2') format('woff2');
+            font-display: swap;
+        }
+        body, textarea {
+            font-family: 'MonoplexKR-Regular', 'Noto Sans KR', sans-serif;
+        }
+        .editor-container {
+            height: calc(100vh - 64px);
+        }
+        #editor {
+            resize: none;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .save-indicator {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: #10B981;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .saving {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <h1 class="text-xl font-semibold mr-6">☘️Kiro</h1>
+            <button id="editModeBtn" class="px-3 py-1 text-sm bg-blue-500 text-white rounded mr-2">편집모드</button>
+            <button id="viewModeBtn" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded">보기모드</button>
+        </div>
+        <div>
+            <button id="saveBtn" class="px-3 py-1 text-sm bg-green-500 text-white rounded mr-2">다운로드</button>
+            <button id="printBtn" class="px-3 py-1 text-sm bg-gray-500 text-white rounded">인쇄</button>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden">
+        <!-- File System Sidebar -->
+        <div class="w-56 bg-white shadow-sm overflow-y-auto">
+            <div class="p-3 border-b">
+                <h2 class="text-sm font-semibold mb-2">파일 시스템</h2>
+                <button id="newFolderBtn" class="text-xs px-2 py-1 bg-gray-200 rounded mr-1">+ 폴더</button>
+                <button id="newFileBtn" class="text-xs px-2 py-1 bg-gray-200 rounded">+ 파일</button>
+            </div>
+            <div id="fileSystem" class="p-2">
+                <!-- File system will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Editor Area -->
+        <div class="flex-1 flex" id="editorArea">
+            <!-- Edit Mode: Split View -->
+            <div class="flex-1 flex editor-container" id="editModeView">
+                <div class="w-1/2 p-4 overflow-hidden flex flex-col">
+                    <h3 class="text-sm font-semibold mb-2">원문 작성</h3>
+                    <textarea id="editor" class="flex-1 p-3 border rounded w-full bg-white" spellcheck="false"></textarea>
+                </div>
+                <div class="w-1/2 p-4 overflow-hidden flex flex-col">
+                    <h3 class="text-sm font-semibold mb-2">미리보기</h3>
+                    <iframe id="editPreviewIframe" class="flex-1 w-full rounded border bg-white shadow" frameborder="0"></iframe>
+                </div>
+            </div>
+            
+            <!-- View Mode -->
+            <div class="flex-1 p-4 overflow-auto hidden" id="viewModeView">
+                <iframe id="viewIframe"
+                    class="w-full max-w-screen-lg h-[90vh] mx-auto rounded-2xl shadow bg-white"
+                    frameborder="0">
+                </iframe>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for new file/folder -->
+    <div id="fileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-4 rounded shadow-lg w-80">
+            <h3 id="modalTitle" class="text-lg font-semibold mb-3">새 파일 생성</h3>
+            <input id="nameInput" type="text" class="w-full border rounded p-2 mb-3" placeholder="이름 입력">
+            <div class="flex justify-end">
+                <button id="cancelBtn" class="px-3 py-1 bg-gray-200 rounded mr-2">취소</button>
+                <button id="confirmBtn" class="px-3 py-1 bg-blue-500 text-white rounded">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static.js"></script>
+</body>
+</html> 

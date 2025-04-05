@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# 사용자 데이터
+kiro_files/
+
+# 환경파일
+.env
