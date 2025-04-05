@@ -777,7 +777,8 @@ def render_kiro(text: str) -> Tuple[str, str]:
             if not in_ol:
                 html.append("<ol class=\"list-decimal ml-6 mb-4\">")
                 in_ol = True
-            html.append(f"<li>{render_inline_kiro(re.sub(r'^\d+\. ', '', line), styles)}</li>")
+            cleaned = re.sub(r'^\d+\. ', '', line)
+            html.append(f"<li>{render_inline_kiro(cleaned, styles)}</li>")
             i += 1
             continue
         elif in_ol:
