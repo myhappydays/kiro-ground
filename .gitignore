@@ -2,8 +2,11 @@
 __pycache__/
 *.pyc
 
-# 사용자 데이터
+# 사용자 데이터 폴더 전체 무시
 kiro_files/
+
+# 그 중 welcome.kiro는 예외로 포함
+!kiro_files/welcome.kiro
 
 # 환경파일
 .env
