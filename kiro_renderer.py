@@ -889,17 +889,15 @@ def convert_file(input_path: str, output_path: str) -> None:
             <style type="text/css">
                 /* 커스텀 리스트 스타일 */
                 .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {{
-                    list-style-type: none;
-                    padding-left: 0;
-                    margin-left: 0;
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
                 }}
                 .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {{
                     display: flex;
                     align-items: baseline;
-                    margin-top: 0.5em;
-                    margin-bottom: 0.5em;
-                    padding-left: 0;
-                    margin-left: 0;
+                    margin: 0;
+                    padding: 0;
                 }}
                 .prose :where(ul.custom-list li span):not(:where([class~="not-prose"] *)) {{
                     font-family: 'JetBrains Mono', monospace;
@@ -907,12 +905,6 @@ def convert_file(input_path: str, output_path: str) -> None:
                     margin-right: 0.5em;
                     min-width: 2em;
                     text-align: right;
-                    flex-shrink: 0;
-                }}
-                /* 하위 항목 스타일 */
-                .prose :where(ul.custom-list li[style*="margin-left"]):not(:where([class~="not-prose"] *)) {{
-                    margin-left: 0 !important;
-                    padding-left: 0;
                 }}
             </style>
         </head>
