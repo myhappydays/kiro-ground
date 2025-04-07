@@ -254,7 +254,7 @@ def render_kiro():
         </head>
         <body class="min-h-screen bg-gray-50 text-gray-800 font-sans">
             <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6">
-                <article class="prose prose-slate prose-lg max-w-none {global_class_str}">
+                <article class="prose prose-slate max-w-none {global_class_str}">
                     {html_body}
                 </article>
             </div>
