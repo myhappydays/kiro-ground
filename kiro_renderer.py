@@ -907,6 +907,61 @@ def convert_file(input_path: str, output_path: str) -> None:
                     display: inline-block;
                     text-align: right;
                 }}
+
+                /* 토글 스타일 개선 */
+                details {{
+                    margin: 1em 0;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 0.5rem;
+                    background-color: #f9fafb;
+                }}
+
+                details[open] {{
+                    background-color: #ffffff;
+                    border-color: #d1d5db;
+                }}
+
+                details summary {{
+                    padding: 0.75rem 1rem;
+                    cursor: pointer;
+                    font-weight: 500;
+                    color: #374151;
+                    position: relative;
+                    list-style: none;
+                }}
+
+                details summary::before {{
+                    content: "▶";
+                    position: absolute;
+                    left: 0.5rem;
+                    color: #6b7280;
+                    font-size: 0.75rem;
+                    transition: transform 0.2s;
+                }}
+
+                details[open] summary::before {{
+                    transform: rotate(90deg);
+                }}
+
+                details > div {{
+                    padding: 0.5rem 1rem 1rem 1.5rem;
+                    border-top: 1px solid #e5e7eb;
+                    margin-top: 0.5rem;
+                }}
+
+                /* 중첩된 토글 스타일 */
+                details details {{
+                    margin-left: 1rem;
+                    margin-right: 0;
+                }}
+
+                details details summary {{
+                    padding-left: 2rem;
+                }}
+
+                details details > div {{
+                    padding-left: 2rem;
+                }}
             </style>
         </head>
         <body class=\"min-h-screen bg-gray-50 text-gray-800 font-sans\">
