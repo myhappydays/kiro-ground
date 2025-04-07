@@ -138,14 +138,24 @@ def extract_color(classes: List[str]) -> Optional[str]:
 
 def apply_inline_styles(text: str) -> str:
     """인라인 스타일을 적용합니다."""
-    text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
-    text = re.sub(r"_(.*?)_", r"<em>\1</em>", text)
-    text = re.sub(
-        r"`(.*?)`",
-        r"<code>\1</code>",
-        text
-    )
-    return text
+    # 중첩된 마크다운 구문을 처리하기 위해 순서대로 처리
+    patterns = [
+        (r"~~(.*?)~~", r"<del class='line-through'>\1</del>"),  # 취소선
+        (r"==(.*?)==", r"<mark class='bg-yellow-200'>\1</mark>"),  # 하이라이트
+        (r"\*\*(.*?)\*\*", r"<strong class='font-bold'>\1</strong>"),  # 굵게
+        (r"_(.*?)_", r"<em class='italic'>\1</em>"),  # 기울임
+        (r"`(.*?)`", r"<code class='px-1 py-0.5 bg-gray-100 text-sm rounded font-jetbrains'>\1</code>")  # 코드
+    ]
+    
+    # 중첩된 패턴을 처리하기 위해 여러 번 반복
+    prev_text = None
+    current_text = text
+    while prev_text != current_text:
+        prev_text = current_text
+        for pattern, replacement in patterns:
+            current_text = re.sub(pattern, replacement, current_text)
+    
+    return current_text
 
 def parse_styles(lines: List[str]) -> Dict:
     """스타일 정의를 파싱합니다."""
@@ -490,13 +500,17 @@ def process_style_content(style_name: str, content: str, styles: Dict) -> StyleR
     class_list = []
     md_structure = style_result["md_structure"]
     
+    # 먼저 인라인 스타일 적용
+    processed_content = render_inline_kiro(content, styles)
+    
     if md_structure:
         # 마크다운 구조 파싱
         md_elements = []
         current_element = ""
         
+        # 마크다운 구조를 파싱하여 요소 목록 생성
         for char in md_structure:
-            if char in ['#', '*', '_', '`', '-', '>', '|']:
+            if char in ['#', '*', '_', '`', '-', '>', '|', '~', '=', '^', '[', ']', '(', ')']:
                 if current_element:
                     md_elements.append(current_element)
                 current_element = char
@@ -505,39 +519,66 @@ def process_style_content(style_name: str, content: str, styles: Dict) -> StyleR
         
         if current_element:
             md_elements.append(current_element)
+            
+        # 중복된 마크다운 요소 제거
+        md_elements = list(dict.fromkeys(md_elements))
         
-        # 마크다운 요소 적용 (중첩 처리)
-        processed_content = content
-        wrapper_tags = []
+        # 마크다운 요소를 우선순위에 따라 정렬
+        priority_order = {
+            '#': 1, '##': 2, '###': 3,  # 헤딩
+            '>': 4,  # 인용
+            '-': 5,  # 리스트
+            '|': 6,  # 단락
+            '**': 7, '_': 8,  # 강조
+            '`': 9,  # 코드
+            '~~': 10, '==': 11  # 기타
+        }
+        md_elements.sort(key=lambda x: priority_order.get(x, 999))
         
+        # 마크다운 요소 적용 (순서 중요)
         for element in md_elements:
             if element.startswith('#'):
-                heading_level = len(element)
-                wrapper_tags.append((f"<h{heading_level} class='text-{heading_level}xl font-bold'>", f"</h{heading_level}>"))
+                level = len(element)
+                if level == 1:
+                    processed_content = f"<h1 class='mt-6 mb-4 text-4xl font-bold'>{processed_content}</h1>"
+                elif level == 2:
+                    processed_content = f"<h2 class='mt-5 mb-3 text-3xl font-bold'>{processed_content}</h2>"
+                elif level == 3:
+                    processed_content = f"<h3 class='mt-4 mb-2 text-2xl font-bold'>{processed_content}</h3>"
             elif element == '**':
-                wrapper_tags.append(("<strong>", "</strong>"))
+                # 기존 strong 태그가 있는지 확인하고 중복 방지
+                if '<strong' not in processed_content:
+                    processed_content = f"<strong class='font-bold'>{processed_content}</strong>"
             elif element == '_':
-                wrapper_tags.append(("<em>", "</em>"))
+                # 기존 em 태그가 있는지 확인하고 중복 방지
+                if '<em' not in processed_content:
+                    processed_content = f"<em class='italic'>{processed_content}</em>"
             elif element == '`':
-                wrapper_tags.append(("<code class='px-1 bg-gray-100 text-sm rounded font-jetbrains'>", "</code>"))
+                # 기존 code 태그가 있는지 확인하고 중복 방지
+                if '<code' not in processed_content:
+                    processed_content = f"<code class='px-1 py-0.5 bg-gray-100 text-sm rounded font-jetbrains'>{processed_content}</code>"
             elif element == '-':
-                wrapper_tags.append(("<li>", "</li>"))
+                processed_content = f"<li class='ml-6'>{processed_content}</li>"
             elif element == '>':
-                wrapper_tags.append(("<blockquote class='my-4 border-l-4 pl-4 italic text-gray-600'>", "</blockquote>"))
+                processed_content = f"<blockquote class='my-4 border-l-4 pl-4 italic text-gray-600'>{processed_content}</blockquote>"
             elif element == '|':
-                wrapper_tags.append(("<p class='mb-2'>", "</p>"))
-        
-        # 중첩된 태그 적용
-        for open_tag, close_tag in wrapper_tags:
-            processed_content = f"{open_tag}{processed_content}{close_tag}"
+                processed_content = f"<p class='mb-4'>{processed_content}</p>"
+            elif element == '~~':
+                processed_content = f"<del class='line-through'>{processed_content}</del>"
+            elif element == '==':
+                processed_content = f"<mark class='bg-yellow-200'>{processed_content}</mark>"
         
         # 리스트 항목인 경우 리스트 컨테이너 추가
         if any(element == '-' for element in md_elements):
             processed_content = f"<ul class='list-disc ml-6 mb-4'>{processed_content}</ul>"
     
+    # 스타일 클래스 처리
     style_elements = style_result["classes"].copy()
     icon_prefix = ""
     style_attr = ""
+    
+    # 색상 클래스 추출
+    color_classes = [cls for cls in style_elements if cls.startswith('text-')]
     
     for style in style_elements:
         if style.startswith('+'):
@@ -552,21 +593,31 @@ def process_style_content(style_name: str, content: str, styles: Dict) -> StyleR
         elif style in FONT_CONFIG:
             font_class = get_font_class(style)
             class_list.append(font_class)
+        elif style == "MonoplexKR-Regular":  # 특수 케이스 처리
+            class_list.append("font-monoplex")
         else:
             class_list.append(style)
     
+    # 기본 마진 추가
     if not any(cls.startswith("m") for cls in class_list):
         class_list.append("mb-4")
     
-    rendered = processed_content if md_structure else render_inline_kiro(content, styles)
-    
+    # 아이콘 접두사 추가
     if icon_prefix:
-        rendered = icon_prefix + rendered
+        processed_content = icon_prefix + processed_content
+    
+    # 색상 클래스가 있는 경우 strong 태그에 색상 클래스 추가
+    if color_classes:
+        processed_content = re.sub(
+            r'<strong class=\'font-bold\'>(.*?)</strong>',
+            lambda m: f'<strong class=\'font-bold {" ".join(color_classes)}\'>{m.group(1)}</strong>',
+            processed_content
+        )
     
     return StyleResult(
         class_list=class_list,
         style_attr=style_attr,
-        rendered=rendered
+        rendered=processed_content
     )
 
 def is_toggle_line(line: str) -> bool:
@@ -910,57 +961,34 @@ def convert_file(input_path: str, output_path: str) -> None:
 
                 /* 토글 스타일 개선 */
                 details {{
-                    margin: 1em 0;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    background-color: #f9fafb;
-                }}
-
-                details[open] {{
-                    background-color: #ffffff;
-                    border-color: #d1d5db;
-                }}
-
-                details summary {{
-                    padding: 0.75rem 1rem;
-                    cursor: pointer;
-                    font-weight: 500;
-                    color: #374151;
                     position: relative;
-                    list-style: none;
+                    margin: 0em 0;
+                    padding-left: 1em;
                 }}
 
-                details summary::before {{
-                    content: "▶";
-                    position: absolute;
-                    left: 0.5rem;
-                    color: #6b7280;
-                    font-size: 0.75rem;
-                    transition: transform 0.2s;
-                }}
-
-                details[open] summary::before {{
-                    transform: rotate(90deg);
+                details::before {{
+                    content: none;
                 }}
 
                 details > div {{
-                    padding: 0.5rem 1rem 1rem 1.5rem;
-                    border-top: 1px solid #e5e7eb;
-                    margin-top: 0.5rem;
+                    position: relative;
+                    margin-left: 1em;
+                    padding-left: 1em;
                 }}
 
-                /* 중첩된 토글 스타일 */
-                details details {{
-                    margin-left: 1rem;
-                    margin-right: 0;
+                details > div::before {{
+                    content: '';
+                    position: absolute;
+                    left: -1em;
+                    top: 0;
+                    bottom: 0;
+                    width: 2px;
+                    background-color: #e5e7eb;
+                    border-radius: 1px;
                 }}
 
-                details details summary {{
-                    padding-left: 2rem;
-                }}
-
-                details details > div {{
-                    padding-left: 2rem;
+                details summary {{
+                    margin-bottom: 0.5em;
                 }}
             </style>
         </head>
