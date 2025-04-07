@@ -888,63 +888,63 @@ def convert_file(input_path: str, output_path: str) -> None:
             {font_styles["tailwind_config"]}
             <style type="text/css">
                 /* 추가 타이포그래피 설정 */
-                .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {
+                .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {{
                     margin-top: 1.5em;
                     margin-bottom: 0.8em;
-                }
-                .prose :where(p):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(p):not(:where([class~="not-prose"] *)) {{
                     margin-top: 1em;
                     margin-bottom: 1em;
-                }
-                .prose :where(blockquote):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(blockquote):not(:where([class~="not-prose"] *)) {{
                     font-style: italic;
                     border-left-width: 0.25rem;
                     border-left-color: #e5e7eb;
                     margin: 1.5em 0;
                     padding-left: 1em;
-                }
-                .prose :where(ol, ul):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(ol, ul):not(:where([class~="not-prose"] *)) {{
                     margin-top: 1em;
                     margin-bottom: 1em;
                     padding-left: 1.5em;
-                }
-                .prose :where(code):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(code):not(:where([class~="not-prose"] *)) {{
                     font-family: 'JetBrains Mono', monospace;
                     font-size: 0.9em;
                     background-color: #f3f4f6;
                     padding: 0.2em 0.4em;
                     border-radius: 0.25rem;
-                }
-                .prose :where(pre):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(pre):not(:where([class~="not-prose"] *)) {{
                     padding: 1em;
                     background-color: #f3f4f6;
                     border-radius: 0.5rem;
                     overflow-x: auto;
-                }
+                }}
                 /* 커스텀 리스트 스타일 */
-                .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {
+                .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {{
                     list-style-type: none;
                     padding-left: 0;
-                }
-                .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {{
                     margin-top: 0.5em;
                     margin-bottom: 0.5em;
-                }
+                }}
                 /* 토글(details) 스타일 */
-                .prose :where(details):not(:where([class~="not-prose"] *)) {
+                .prose :where(details):not(:where([class~="not-prose"] *)) {{
                     border: 1px solid #e5e7eb;
                     border-radius: 0.5rem;
                     padding: 0.5rem;
                     margin-bottom: 1rem;
-                }
-                .prose :where(summary):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(summary):not(:where([class~="not-prose"] *)) {{
                     cursor: pointer;
                     font-weight: 600;
-                }
-                .prose :where(details > div):not(:where([class~="not-prose"] *)) {
+                }}
+                .prose :where(details > div):not(:where([class~="not-prose"] *)) {{
                     padding-left: 1rem;
                     padding-top: 0.5rem;
-                }
+                }}
             </style>
         </head>
         <body class=\"min-h-screen bg-gray-50 text-gray-800 font-sans\">
@@ -960,8 +960,10 @@ def convert_file(input_path: str, output_path: str) -> None:
         Path(output_path).write_text(html, encoding="utf-8")
         print(f"💾 저장 완료: {output_path}")
     except Exception as e:
+        import traceback
         print(f"❌ 오류 발생: {e}")
-        raise
+        traceback.print_exc()
+        sys.exit(1)
 
 def process_styled_line(line: str, styles: Dict) -> str:
     """스타일 태그가 포함된 줄을 처리합니다."""
@@ -1023,5 +1025,7 @@ if __name__ == "__main__":
             convert_file(sys.argv[1], sys.argv[2])
             print("🎉 렌더링 성공!")
         except Exception as e:
+            import traceback
             print(f"❌ 오류 발생: {e}")
+            traceback.print_exc()
             sys.exit(1)
