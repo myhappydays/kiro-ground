@@ -207,7 +207,7 @@ def render_kiro():
 
                 /* 헤딩 마진 조정 */
                 .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {{
-                    margin-bottom: 0.5em;
+                    margin-bottom: 0.3em;
                 }}
 
                 .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {{
