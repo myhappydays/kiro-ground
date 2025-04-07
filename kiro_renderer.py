@@ -142,7 +142,7 @@ def apply_inline_styles(text: str) -> str:
     text = re.sub(r"_(.*?)_", r"<em>\1</em>", text)
     text = re.sub(
         r"`(.*?)`",
-        r"<code class='px-1 bg-gray-100 text-sm rounded font-jetbrains'>\1</code>",
+        r"<code>\1</code>",
         text
     )
     return text
@@ -610,13 +610,13 @@ def process_toggle_content(lines: List[str], start_index: int, depth: int, style
             
             if heading:
                 heading_level = len(heading)
-                content_html.append(f'<details class="my-3 border rounded-lg p-2" open>')
-                content_html.append(f'<summary class="cursor-pointer text-{heading_level}xl font-bold">{rendered_content}</summary>')
-                content_html.append('<div class="pl-4 py-2">')
+                content_html.append(f'<details open>')
+                content_html.append(f'<summary>{rendered_content}</summary>')
+                content_html.append('<div>')
             else:
-                content_html.append(f'<details class="my-3 border rounded-lg p-2" open>')
-                content_html.append(f'<summary class="cursor-pointer">{rendered_content}</summary>')
-                content_html.append('<div class="pl-4 py-2">')
+                content_html.append(f'<details open>')
+                content_html.append(f'<summary>{rendered_content}</summary>')
+                content_html.append('<div>')
             
             content_html.extend(next_content)
             content_html.append('</div></details>')
@@ -685,7 +685,7 @@ def render_kiro(text: str) -> Tuple[str, str]:
             in_code_block = not in_code_block
             if not in_code_block:
                 code_html = "\n".join(code_lines)
-                html.append(f'<pre class="my-6 p-4 bg-gray-100 rounded overflow-auto"><code class="font-jetbrains">{code_html}</code></pre>')
+                html.append(f'<pre><code>{code_html}</code></pre>')
                 code_lines = []
             i += 1
             continue
@@ -719,13 +719,13 @@ def render_kiro(text: str) -> Tuple[str, str]:
                 
                 if heading:
                     heading_level = len(heading)
-                    html.append(f'<details class="my-4 border rounded-lg p-2" open>')
-                    html.append(f'<summary class="cursor-pointer text-{heading_level}xl font-bold">{rendered_content}</summary>')
-                    html.append('<div class="pl-4 py-2">')
+                    html.append(f'<details open>')
+                    html.append(f'<summary>{rendered_content}</summary>')
+                    html.append('<div>')
                 else:
-                    html.append(f'<details class="my-4 border rounded-lg p-2" open>')
-                    html.append(f'<summary class="cursor-pointer">{rendered_content}</summary>')
-                    html.append('<div class="pl-4 py-2">')
+                    html.append(f'<details open>')
+                    html.append(f'<summary>{rendered_content}</summary>')
+                    html.append('<div>')
             else:
                 if heading:
                     heading_level = len(heading)
@@ -743,7 +743,7 @@ def render_kiro(text: str) -> Tuple[str, str]:
             continue
         elif in_quote_block and not line.startswith("| "):
             quote_html = "<br>".join(quote_lines)
-            html.append(f'<blockquote class="my-4 border-l-4 pl-4 italic text-gray-600">{quote_html}</blockquote>')
+            html.append(f'<blockquote>{quote_html}</blockquote>')
             quote_lines = []
             in_quote_block = False
 
@@ -763,7 +763,7 @@ def render_kiro(text: str) -> Tuple[str, str]:
         custom_list_match = re.match(r"^-([0-9A-Za-z\.]+)\s+(.*)", line)
         if custom_list_match:
             if not in_custom_list:
-                html.append('<ul class="list-none space-y-1 mb-4">')
+                html.append('<ul class="custom-list">') 
                 in_custom_list = True
             list_key, content = custom_list_match.groups()
             html.append(f'<li><span class="text-gray-500 font-mono mr-2">{list_key}</span>{render_inline_kiro(content, styles)}</li>')
@@ -775,7 +775,7 @@ def render_kiro(text: str) -> Tuple[str, str]:
 
         if re.match(r"^\d+\. ", line):
             if not in_ol:
-                html.append("<ol class=\"list-decimal ml-6 mb-4\">")
+                html.append("<ol>")
                 in_ol = True
             cleaned = re.sub(r'^\d+\. ', '', line)
             html.append(f"<li>{render_inline_kiro(cleaned, styles)}</li>")
@@ -792,14 +792,14 @@ def render_kiro(text: str) -> Tuple[str, str]:
             
             if indent_level > 0:
                 if not in_ul:
-                    html.append("<ul class=\"list-disc ml-6 mb-4\">")
+                    html.append("<ul>")
                     in_ul = True
                 
                 content_html = render_inline_kiro(content, styles)
                 html.append(f"<li class=\"ml-{indent_level * 4}\">{content_html}</li>")
             else:
                 if not in_ul:
-                    html.append("<ul class=\"list-disc ml-6 mb-4\">")
+                    html.append("<ul>")
                     in_ul = True
                 html.append(f"<li>{render_inline_kiro(content, styles)}</li>")
             i += 1
@@ -813,7 +813,7 @@ def render_kiro(text: str) -> Tuple[str, str]:
             
             if indent_level >= 0:
                 if not in_ul:
-                    html.append("<ul class=\"list-disc ml-6 mb-4\">")
+                    html.append("<ul>")
                     in_ul = True
                 
                 content_html = render_inline_kiro(content, styles)
@@ -829,30 +829,30 @@ def render_kiro(text: str) -> Tuple[str, str]:
             in_ul = False
 
         if line.startswith("### "):
-            html.append(f'<h3 class="text-xl font-bold mt-6 mb-2">{render_inline_kiro(line[4:], styles)}</h3>')
+            html.append(f'<h3>{render_inline_kiro(line[4:], styles)}</h3>')
             i += 1
             continue
         elif line.startswith("## "):
-            html.append(f'<h2 class="text-2xl font-bold mt-8 mb-3">{render_inline_kiro(line[3:], styles)}</h2>')
+            html.append(f'<h2>{render_inline_kiro(line[3:], styles)}</h2>')
             i += 1
             continue
         elif line.startswith("# "):
-            html.append(f'<h1 class="text-3xl font-bold mt-10 mb-4">{render_inline_kiro(line[2:], styles)}</h1>')
+            html.append(f'<h1>{render_inline_kiro(line[2:], styles)}</h1>')
             i += 1
             continue
 
         if stripped == "---":
-            html.append("<hr class=\"my-8\">")
+            html.append("<hr>")
         elif not stripped:
             html.append("<p></p>")
         else:
-            html.append(f"<p class=\"mb-4\">{render_inline_kiro(line, styles)}</p>")
+            html.append(f"<p>{render_inline_kiro(line, styles)}</p>")
 
         i += 1
 
     if in_quote_block:
         quote_html = "<br>".join(quote_lines)
-        html.append(f'<blockquote class="my-4 border-l-4 pl-4 italic text-gray-600">{quote_html}</blockquote>')
+        html.append(f'<blockquote>{quote_html}</blockquote>')
     if in_ul:
         html.append("</ul>")
     if in_ol:
@@ -881,15 +881,75 @@ def convert_file(input_path: str, output_path: str) -> None:
         <head>
             <meta charset=\"UTF-8\">
             <title>Kiro Rendered Document</title>
-            <script src=\"https://cdn.tailwindcss.com\"></script>
+            <script src=\"https://cdn.tailwindcss.com?plugins=typography\"></script>
             {font_styles["google_fonts"]}
             {font_styles["custom_fonts_links"]}
             {font_styles["custom_fonts"]}
             {font_styles["tailwind_config"]}
+            <style type="text/css">
+                /* 추가 타이포그래피 설정 */
+                .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {
+                    margin-top: 1.5em;
+                    margin-bottom: 0.8em;
+                }
+                .prose :where(p):not(:where([class~="not-prose"] *)) {
+                    margin-top: 1em;
+                    margin-bottom: 1em;
+                }
+                .prose :where(blockquote):not(:where([class~="not-prose"] *)) {
+                    font-style: italic;
+                    border-left-width: 0.25rem;
+                    border-left-color: #e5e7eb;
+                    margin: 1.5em 0;
+                    padding-left: 1em;
+                }
+                .prose :where(ol, ul):not(:where([class~="not-prose"] *)) {
+                    margin-top: 1em;
+                    margin-bottom: 1em;
+                    padding-left: 1.5em;
+                }
+                .prose :where(code):not(:where([class~="not-prose"] *)) {
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 0.9em;
+                    background-color: #f3f4f6;
+                    padding: 0.2em 0.4em;
+                    border-radius: 0.25rem;
+                }
+                .prose :where(pre):not(:where([class~="not-prose"] *)) {
+                    padding: 1em;
+                    background-color: #f3f4f6;
+                    border-radius: 0.5rem;
+                    overflow-x: auto;
+                }
+                /* 커스텀 리스트 스타일 */
+                .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {
+                    list-style-type: none;
+                    padding-left: 0;
+                }
+                .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {
+                    margin-top: 0.5em;
+                    margin-bottom: 0.5em;
+                }
+                /* 토글(details) 스타일 */
+                .prose :where(details):not(:where([class~="not-prose"] *)) {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 0.5rem;
+                    padding: 0.5rem;
+                    margin-bottom: 1rem;
+                }
+                .prose :where(summary):not(:where([class~="not-prose"] *)) {
+                    cursor: pointer;
+                    font-weight: 600;
+                }
+                .prose :where(details > div):not(:where([class~="not-prose"] *)) {
+                    padding-left: 1rem;
+                    padding-top: 0.5rem;
+                }
+            </style>
         </head>
         <body class=\"min-h-screen bg-gray-50 text-gray-800 font-sans\">
-            <div class=\"max-w-3xl mx-auto p-6\">
-                <article class="prose prose-lg {global_class_str}">
+            <div class=\"max-w-3xl mx-auto py-10 px-4 sm:px-6\">
+                <article class="prose prose-slate prose-lg max-w-none {global_class_str}">
                     {html_body}
                 </article>
             </div>
