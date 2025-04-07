@@ -763,10 +763,11 @@ def render_kiro(text: str) -> Tuple[str, str]:
         custom_list_match = re.match(r"^-([0-9A-Za-z\.]+)\s+(.*)", line)
         if custom_list_match:
             if not in_custom_list:
-                html.append('<ul class="custom-list">')
+                html.append('<ul class="custom-list pl-0 -ml-20">')
                 in_custom_list = True
             list_key, content = custom_list_match.groups()
-            html.append(f'<li><span>{list_key}</span>{render_inline_kiro(content, styles)}</li>')
+            styled_key = f'<span class="inline-block w-[6em] text-right text-gray-500 font-mono">{list_key}</span>'
+            html.append(f'<li>{styled_key} {render_inline_kiro(content, styles)}</li>')
             i += 1
             continue
         elif in_custom_list:
@@ -890,7 +891,7 @@ def convert_file(input_path: str, output_path: str) -> None:
                 /* 커스텀 리스트 스타일 */
                 .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {{
                     list-style-type: none;
-                    padding-left: 1.5em;
+                    padding-left: 0em;
                 }}
                 .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {{
                     display: flex;
@@ -902,7 +903,9 @@ def convert_file(input_path: str, output_path: str) -> None:
                     font-family: 'JetBrains Mono', monospace;
                     color: #6b7280;
                     margin-right: 0.5em;
-                    min-width: 2em;
+                    min-width: 3em;
+                    display: inline-block;
+                    text-align: right;
                 }}
             </style>
         </head>
