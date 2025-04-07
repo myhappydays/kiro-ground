@@ -185,26 +185,79 @@ def render_kiro():
         sys.stdout = old_stdout
 
         font_styles = kiro_renderer.generate_font_styles()
-        font_css = "\n".join([
-            font_styles.get("google_fonts", ""),
-            font_styles.get("custom_fonts_links", ""),
-            f"<style>{font_styles.get('custom_fonts', '')}</style>"
-        ])
 
         full_html = f"""
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="ko">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>미리보기</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            {font_css}
+            <title>Kiro Rendered Document</title>
+            <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+            {font_styles["google_fonts"]}
+            {font_styles["custom_fonts_links"]}
+            {font_styles["custom_fonts"]}
+            {font_styles["tailwind_config"]}
+            <style type="text/css">
+                /* 커스텀 리스트 스타일 */
+                .prose :where(ul.custom-list):not(:where([class~="not-prose"] *)) {{
+                    list-style-type: none;
+                    padding-left: 0em;
+                }}
+                .prose :where(ul.custom-list li):not(:where([class~="not-prose"] *)) {{
+                    display: flex;
+                    align-items: baseline;
+                    margin-top: 0.5em;
+                    margin-bottom: 0.5em;
+                }}
+                .prose :where(ul.custom-list li span):not(:where([class~="not-prose"] *)) {{
+                    font-family: 'JetBrains Mono', monospace;
+                    color: #6b7280;
+                    margin-right: 0.5em;
+                    min-width: 3em;
+                    display: inline-block;
+                    text-align: right;
+                }}
+
+                /* 토글 스타일 개선 */
+                details {{
+                    position: relative;
+                    margin: 0em 0;
+                    padding-left: 1em;
+                }}
+
+                details::before {{
+                    content: none;
+                }}
+
+                details > div {{
+                    position: relative;
+                    margin-left: 1em;
+                    padding-left: 1em;
+                }}
+
+                details > div::before {{
+                    content: '';
+                    position: absolute;
+                    left: -1em;
+                    top: 0;
+                    bottom: 0;
+                    width: 2px;
+                    background-color: #e5e7eb;
+                    border-radius: 1px;
+                }}
+
+                details summary {{
+                    margin-bottom: 0.5em;
+                }}
+            </style>
         </head>
-        <body class="bg-white">
-            <article class="prose prose-lg max-w-screen-md px-6 mx-auto {global_class_str}">
-                {html_body}
-            </article>
+        <body class="min-h-screen bg-gray-50 text-gray-800 font-sans">
+            <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6">
+                <article class="prose prose-slate prose-lg max-w-none {global_class_str}">
+                    {html_body}
+                </article>
+            </div>
         </body>
         </html>
         """
