@@ -990,6 +990,11 @@ def convert_file(input_path: str, output_path: str) -> None:
                 details summary {{
                     margin-bottom: 0.5em;
                 }}
+
+                /* 헤딩 마진 조정 */
+                .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {
+                    margin-bottom: 0.5em;
+                }
             </style>
         </head>
         <body class=\"min-h-screen bg-gray-50 text-gray-800 font-sans\">
