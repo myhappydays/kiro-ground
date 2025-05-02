@@ -8,26 +8,6 @@
 # Kiro ☘️
 
 | Kiro는 텍스트 입력에서부터 기록, 인쇄, 발행에 이르기까지 전 과정을 고려해 설계된 명시적 구조의 마크업 언어입니다.  
-@link:https://github.com/myhappydays/kiro-ground ! Github 리포지토리
-
----
-
-## ✨ 소개
-
-Kiro는 마크다운의 장점을 계승하면서도, 문서의 시각적 구조와 의미 표현을 명시적으로 설계할 수 있도록 만들어진 새로운 마크업 언어입니다.  
-입력부터 발행까지 흐름이 끊기지 않도록 설계되어 있으며, 복잡한 문법 대신 직관적이고 구조화된 작성 경험을 제공합니다.
-
-| 이 프로젝트는 Kiro 문법을 렌더링하고 실시간으로 작성할 수 있는 에디터 Ground를 포함하고 있습니다.  
-| 자세한 문법 등의 사항은 레포지토리style>
-[!global] = [=RIDIBatang]
-[체크박스] = [#444] [$bg:gray-100] [$rounded] [$px:2] [$py:0.5] [$text-sm] [$font-mono] [$opacity-80]
-[라이선스] = [#008060] [$font-bold] [$italic]
-[미완료] = [#b91c1c] [$bg-red-100] [$rounded] [$px:2] [$py:0.5] [$text-sm] [$font-mono] [$opacity-90]
-<>
-
-# Kiro ☘️
-
-| Kiro는 텍스트 입력에서부터 기록, 인쇄, 발행에 이르기까지 전 과정을 고려해 설계된 명시적 구조의 마크업 언어입니다.  
 @link:https://https://github.com/myhappydays/kiro-ground ! Github 저장소
 
 ---
